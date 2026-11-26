@@ -1,0 +1,579 @@
+/* The Famous Math Note: the app's own look on the web.
+   Colors come from the app: BannerStyle.ground (#333), the iOS grouped backgrounds,
+   system blue for answers and buttons, and PaperColor for the paper. */
+
+:root {
+  --ground: #333333;              /* BannerStyle.ground, the portrait's grey */
+  --page: #f2f2f7;                /* systemGroupedBackground */
+  --card: #ffffff;                /* secondarySystemGroupedBackground */
+  --fill: rgba(120, 120, 128, 0.12);
+  --text: #000000;
+  --text-2: rgba(60, 60, 67, 0.62);
+  --text-3: rgba(60, 60, 67, 0.36);
+  --separator: rgba(60, 60, 67, 0.16);
+  --blue: #007aff;                /* systemBlue: answers and buttons */
+  --orange: #ff9500;              /* the uncertain-reading dot */
+  --shadow: 0 3px 12px rgba(0, 0, 0, 0.13);   /* CardShadow */
+
+  /* PaperColor.white */
+  --paper: #ffffff;
+  --rule: rgba(158, 189, 230, 0.55);
+  --margin: rgba(230, 89, 89, 0.45);
+  --ink: #111111;
+
+  --display: "Playfair Display", "Times New Roman", serif;
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --hand: "Noteworthy", "Patrick Hand", "Comic Neue", cursive;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --page: #000000;
+    --card: #1c1c1e;
+    --fill: rgba(120, 120, 128, 0.24);
+    --text: #ffffff;
+    --text-2: rgba(235, 235, 245, 0.62);
+    --text-3: rgba(235, 235, 245, 0.32);
+    --separator: rgba(84, 84, 88, 0.6);
+    --blue: #0a84ff;
+    --orange: #ff9f0a;
+    --shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme="dark"] {
+  --page: #000000;
+  --card: #1c1c1e;
+  --fill: rgba(120, 120, 128, 0.24);
+  --text: #ffffff;
+  --text-2: rgba(235, 235, 245, 0.62);
+  --text-3: rgba(235, 235, 245, 0.32);
+  --separator: rgba(84, 84, 88, 0.6);
+  --blue: #0a84ff;
+  --orange: #ff9f0a;
+  --shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--page);
+  color: var(--text);
+  font: 17px/1.5 var(--ui);
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 6px; }
+
+.wrap { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 700px) { .wrap { padding: 0 36px; } }
+
+/* ------------------------------------------------------------ the banner */
+.banner {
+  position: relative;
+  background-color: var(--ground);
+  background-image: url("assets/banner.jpg");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: auto 100%;
+  color: #fff;
+  overflow: hidden;
+}
+.banner.small { background-size: auto 100%; }
+.banner::before {           /* keeps the words readable where they cross the portrait */
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--ground) 0%, rgba(51,51,51,0.92) 45%, rgba(51,51,51,0) 75%);
+  pointer-events: none;
+}
+.banner > * { position: relative; }
+
+/* The navigation bar floats over the page like iPadOS's: separate capsules of Liquid Glass
+   (a blurred, brightened view of what is behind, a bright rim on top, a soft shadow).
+   Over the dark banner the glass is clear with white text; once the page scrolls under it,
+   it takes the page's tint (nav.js sets .over-page). The title capsule appears when the
+   page's large title has scrolled under the bar, as a large title collapses on iOS. */
+.banner { padding-top: 72px; }
+.banner > .navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+  padding-top: max(12px, env(safe-area-inset-top));
+  pointer-events: none;                 /* only the capsules take touches */
+}
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.glass {
+  --glass-fill: rgba(255, 255, 255, 0.12);
+  --glass-rim: rgba(255, 255, 255, 0.55);
+  --glass-edge: rgba(255, 255, 255, 0.16);
+  --glass-ink: #fff;
+  --glass-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+  position: relative;
+  pointer-events: auto;
+  display: flex; align-items: center;
+  height: 46px; padding: 0 6px; border-radius: 999px;
+  color: var(--glass-ink);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%),
+    var(--glass-fill);
+  -webkit-backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
+  backdrop-filter: blur(22px) saturate(190%) brightness(1.06);
+  box-shadow:
+    inset 0 1px 0.5px var(--glass-rim),           /* light catching the top edge */
+    inset 0 -1px 1px rgba(255, 255, 255, 0.06),
+    0 0 0 0.5px var(--glass-edge),
+    var(--glass-shadow);
+  transition: background-color 0.35s, color 0.35s, box-shadow 0.35s, opacity 0.3s, transform 0.3s;
+}
+.glass::after {                 /* the sheen: brighter at the top left, as if lit */
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: radial-gradient(120% 140% at 15% -30%, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%);
+  mix-blend-mode: screen;
+}
+.navbar.over-page .glass {
+  --glass-fill: rgba(255, 255, 255, 0.58);
+  --glass-rim: rgba(255, 255, 255, 0.9);
+  --glass-edge: rgba(0, 0, 0, 0.07);
+  --glass-ink: #000;
+  --glass-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .navbar.over-page .glass {
+    --glass-fill: rgba(44, 44, 46, 0.55);
+    --glass-rim: rgba(255, 255, 255, 0.22);
+    --glass-edge: rgba(255, 255, 255, 0.1);
+    --glass-ink: #fff;
+    --glass-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+  }
+}
+:root[data-theme="dark"] .navbar.over-page .glass {
+  --glass-fill: rgba(44, 44, 46, 0.55);
+  --glass-rim: rgba(255, 255, 255, 0.22);
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --glass-ink: #fff;
+  --glass-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass { --glass-fill: rgba(60, 60, 60, 0.92); }
+  .navbar.over-page .glass { --glass-fill: rgba(250, 250, 252, 0.96); }
+}
+
+/* The title capsule splits off the right-hand capsule, the way the Dynamic Island splits in two
+   when a second app is running: a small pill buds out from under the left edge of the links
+   capsule, which stretches toward it and snaps back; the pill then travels left to its place,
+   widening to fit the title as it goes, overshoots a little (the rubber band) and settles.
+   Scrolling back up runs it in reverse: the capsule shrinks and slides back into the links.
+   nav.js sets --brand-w (full width) and --brand-dx (how far right the links capsule starts);
+   without them the capsule simply fades. */
+:root {
+  --spring: cubic-bezier(0.34, 1.5, 0.64, 1);         /* browsers without linear() */
+  --spring-soft: cubic-bezier(0.3, 1.2, 0.6, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+:root {
+  /* damped springs: ~10% overshoot for the width, ~4% for the travel */
+  --spring: linear(0, 0.0339, 0.1207, 0.2403, 0.3762, 0.5151, 0.6472, 0.766, 0.8674, 0.9496, 1.0126,
+    1.0576, 1.0866, 1.1021, 1.1068, 1.1033, 1.0942, 1.0815, 1.067, 1.0521, 1.038, 1.0253, 1.0144,
+    1.0056, 0.9988, 0.9939, 0.9908, 0.9891, 0.9886, 0.9889, 0.9899, 0.9913, 0.9928, 0.9944, 0.9959,
+    0.9973, 0.9984, 0.9994, 1.0001, 1.0006, 1);
+  --spring-soft: linear(0, 0.0303, 0.1064, 0.2095, 0.3253, 0.4431, 0.5556, 0.6581, 0.7478, 0.8236,
+    0.8857, 0.9347, 0.972, 0.9992, 1.0179, 1.0296, 1.036, 1.0383, 1.0377, 1.0352, 1.0314, 1.027,
+    1.0225, 1.0181, 1.0141, 1.0105, 1.0074, 1.0049, 1.0029, 1.0014, 1.0003, 0.9995, 0.999, 0.9987,
+    0.9985, 0.9985, 0.9986, 0.9988, 0.9989, 0.9991, 1);
+}
+}
+.navbar .brand {
+  z-index: 1;                          /* under the links capsule it comes out of */
+  justify-content: center; overflow: hidden;
+  width: var(--brand-w, auto);
+  padding: 0 18px; font-weight: 600; white-space: nowrap;
+  transform-origin: 100% 50%;
+  translate: 0 0; scale: 1 1;
+  transition:
+    translate 0.78s var(--spring-soft),
+    width 0.78s var(--spring) 0.06s,
+    scale 0.6s var(--spring),
+    opacity 0.12s ease-out,
+    background-color 0.35s, color 0.35s, box-shadow 0.35s;
+}
+.navbar .toplinks { z-index: 2; transform-origin: 100% 50%; }
+.navbar .brand, .navbar .brand:hover { color: var(--glass-ink); text-decoration: none; }
+.navbar .brand span {
+  font-family: var(--display); font-size: 18px;
+  transition: opacity 0.3s ease-out 0.26s, filter 0.4s ease-out 0.22s, transform 0.6s var(--spring) 0.2s;
+}
+.navbar.title-hidden .brand {
+  width: 46px;                         /* a pill as tall as it is wide */
+  translate: var(--brand-dx, 0) 0;
+  scale: 0.7 0.82;
+  opacity: 0;
+  pointer-events: none;
+  transition:                          /* going back in: quick, no bounce */
+    translate 0.42s cubic-bezier(0.5, 0, 0.75, 0.6),
+    width 0.3s cubic-bezier(0.4, 0, 0.6, 1),
+    scale 0.42s cubic-bezier(0.4, 0, 0.6, 1),
+    opacity 0.1s linear 0.32s,
+    background-color 0.35s, color 0.35s, box-shadow 0.35s;
+}
+.navbar.title-hidden .brand span {
+  opacity: 0; filter: blur(6px); transform: scale(0.86);
+  transition: opacity 0.12s ease-in, filter 0.12s ease-in, transform 0.2s ease-in;
+}
+/* the links capsule stretches toward the pill as it lets go of it (and as it takes it back) */
+.navbar .toplinks.pull { animation: island-pull 0.62s cubic-bezier(0.3, 0, 0.3, 1); }
+.navbar .toplinks.absorb { animation: island-absorb 0.5s cubic-bezier(0.3, 0, 0.3, 1); }
+@keyframes island-pull {
+  0%   { scale: 1 1; }
+  22%  { scale: 1.045 0.95; }
+  48%  { scale: 0.985 1.02; }
+  72%  { scale: 1.006 0.995; }
+  100% { scale: 1 1; }
+}
+@keyframes island-absorb {
+  0%   { scale: 1 1; }
+  60%  { scale: 1 1; }
+  78%  { scale: 1.035 0.96; }
+  100% { scale: 1 1; }
+}
+.navbar.no-anim .brand, .navbar.no-anim .brand span { transition: none !important; }
+@media (prefers-reduced-motion: reduce) {
+  .navbar .brand, .navbar.title-hidden .brand { width: var(--brand-w, auto); translate: none; scale: none; transition: opacity 0.2s; }
+  .navbar .brand span, .navbar.title-hidden .brand span { filter: none; transform: none; transition: opacity 0.2s; }
+  .navbar .toplinks.pull, .navbar .toplinks.absorb { animation: none; }
+}
+.toplinks { gap: 2px; margin-left: auto; }
+.toplinks a {
+  color: var(--glass-ink); font-size: 15px; font-weight: 500;
+  height: 36px; padding: 0 14px; border-radius: 999px; display: flex; align-items: center;
+  transition: background-color 0.2s;
+}
+.toplinks a:hover { background: rgba(127, 127, 127, 0.16); text-decoration: none; }
+.toplinks a:active { background: rgba(127, 127, 127, 0.26); }
+@media (max-width: 560px) {
+  .toplinks a.opt { display: none; }
+  .navbar .brand { padding: 0 14px; }
+  .navbar .brand span { font-size: 16px; }
+  .navbar.title-hidden .brand { width: 42px; }
+  .glass { height: 42px; }
+  .toplinks a { padding: 0 11px; }
+}
+@media (prefers-reduced-motion: reduce) { .glass { transition: none; } }
+
+/* the menu button and its menu: phones show one button in place of the links */
+.menu-btn {
+  display: none; width: 36px; height: 36px; border: 0; padding: 0; border-radius: 50%;
+  background: transparent; color: var(--glass-ink); cursor: pointer;
+  flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+.menu-btn:active { background: rgba(127, 127, 127, 0.26); }
+.menu-btn i {
+  display: block; width: 17px; height: 2px; border-radius: 1px; background: currentColor;
+  transition: transform 0.4s var(--spring), opacity 0.2s;
+}
+.navbar.menu-open .menu-btn i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.navbar.menu-open .menu-btn i:nth-child(2) { opacity: 0; transform: scaleX(0.2); }
+.navbar.menu-open .menu-btn i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+.topbar { position: relative; }
+.menu {
+  position: absolute; right: 16px; top: calc(100% + 8px);
+  height: auto; min-width: 200px; padding: 6px; border-radius: 22px;
+  flex-direction: column; align-items: stretch;
+  --glass-fill: rgba(30, 30, 32, 0.62);
+  transform-origin: calc(100% - 24px) -20px;
+  opacity: 0; scale: 0.6; translate: 0 -10px; visibility: hidden;
+  transition: opacity 0.18s, scale 0.25s ease-in, translate 0.25s ease-in, visibility 0s 0.25s,
+    background-color 0.35s, color 0.35s, box-shadow 0.35s;
+}
+.navbar.over-page .menu { --glass-fill: rgba(255, 255, 255, 0.78); }
+:root[data-theme="dark"] .navbar.over-page .menu { --glass-fill: rgba(44, 44, 46, 0.8); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .navbar.over-page .menu { --glass-fill: rgba(44, 44, 46, 0.8); } }
+.navbar.menu-open .menu {
+  opacity: 1; scale: 1; translate: 0 0; visibility: visible;
+  transition: opacity 0.15s, scale 0.55s var(--spring), translate 0.55s var(--spring), visibility 0s,
+    background-color 0.35s, color 0.35s, box-shadow 0.35s;
+}
+.menu a {
+  position: relative; z-index: 1;
+  color: var(--glass-ink); font-size: 17px; font-weight: 500;
+  padding: 11px 14px; border-radius: 16px;
+}
+.menu a:hover { background: rgba(127, 127, 127, 0.16); text-decoration: none; }
+.menu a:active { background: rgba(127, 127, 127, 0.26); }
+.menu a + a { box-shadow: 0 -0.5px 0 rgba(127, 127, 127, 0.3); }
+.menu a:hover + a, .menu a:active + a { box-shadow: none; }
+@media (max-width: 560px) {
+  .toplinks a { display: none; }
+  .menu-btn { display: flex; }
+  .toplinks { padding: 0 3px; }
+}
+@media (min-width: 561px) { .menu { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .menu, .navbar.menu-open .menu { scale: none; translate: none; transition: opacity 0.15s, visibility 0s; }
+  .menu-btn i { transition: none; }
+}
+
+.hero { padding-top: 64px; padding-bottom: 56px; min-height: 520px; display: flex; flex-direction: column; justify-content: flex-end; }
+.hero h1 {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(42px, 7.4vw, 84px); line-height: 1.02; letter-spacing: -0.01em;
+  margin: 0 0 18px; max-width: 11ch;
+}
+.hero p.lede { font-size: clamp(19px, 2.2vw, 23px); color: rgba(255,255,255,0.82); max-width: 30ch; margin: 0 0 30px; }
+.hero .status { font-size: 13px; color: rgba(255,255,255,0.6); margin-top: 18px; }
+@media (max-width: 700px) {
+  .banner { background-size: auto 340px; background-position: right top; }
+  .banner::before { background: linear-gradient(180deg, rgba(51,51,51,0) 0, rgba(51,51,51,0) 190px, var(--ground) 340px); }
+  .banner.small { background-size: auto 100%; background-position: right bottom; }
+  .banner.small::before { background: linear-gradient(90deg, var(--ground) 30%, rgba(51,51,51,0.75) 100%); }
+  .hero { min-height: 0; padding-top: 210px; }
+}
+
+.buttons { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 48px; padding: 0 22px; border-radius: 12px;
+  font: 600 17px var(--ui); border: 0; cursor: pointer;
+  background: var(--blue); color: #fff;
+}
+.btn:hover { text-decoration: none; filter: brightness(1.08); }
+.btn svg { width: 20px; height: 20px; }
+.btn.capsule { border-radius: 999px; background: rgba(255,255,255,0.12); color: #fff; }
+.btn.capsule:hover { background: rgba(255,255,255,0.18); }
+.btn[aria-disabled="true"] { cursor: default; }
+
+/* ------------------------------------------------------------ sections */
+section { padding: 72px 0; scroll-margin-top: 0; }
+#try, #features, #privacy { scroll-margin-top: 10px; }
+.eyebrow { font-size: 15px; font-weight: 600; color: var(--text-2); margin: 0 0 6px; }
+h2 {
+  font-family: var(--display); font-weight: 700;
+  font-size: clamp(32px, 4.4vw, 46px); line-height: 1.1; margin: 0 0 14px;
+}
+.sub { color: var(--text-2); font-size: 19px; max-width: 46ch; margin: 0 0 36px; }
+
+/* ------------------------------------------------------------ the live page */
+.demo { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
+@media (max-width: 900px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+
+.sheet {
+  position: relative;
+  background: var(--paper);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: background-color 0.3s;
+}
+.sheet svg.page { display: block; width: 100%; height: auto; touch-action: manipulation; }
+.sheet .ink path { fill: none; stroke: var(--ink); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
+.sheet[data-color="cream"] { --paper: #fcf7e6; --rule: rgba(179, 168, 140, 0.45); --margin: rgba(230, 89, 89, 0.45); --ink: #111; }
+.sheet[data-color="dark"]  { --paper: #212329; --rule: rgba(255, 255, 255, 0.13); --margin: rgba(230, 102, 102, 0.35); --ink: #f2f2f2; }
+.sheet[data-color="white"] { --paper: #ffffff; --rule: rgba(158, 189, 230, 0.55); --margin: rgba(230, 89, 89, 0.45); --ink: #111; }
+
+.answer { fill: var(--blue); font-family: var(--hand); opacity: 0; transition: opacity 0.45s ease; }
+.answer line { stroke: var(--blue); stroke-width: 2.4; stroke-linecap: round; }
+.answer.on { opacity: 1; }
+.dot { fill: var(--orange); opacity: 0; transition: opacity 0.45s ease; }
+.dot.on { opacity: 1; }
+.hit { fill: transparent; cursor: pointer; }
+.hit:hover, .hit:focus-visible { fill: rgba(0, 122, 255, 0.06); outline: none; }
+.hit.sel { fill: rgba(0, 122, 255, 0.10); }
+
+.caption-bar {
+  display: flex; align-items: center; gap: 12px; justify-content: space-between;
+  padding: 12px 16px; border-top: 1px solid var(--separator);
+  background: var(--card); font-size: 15px; color: var(--text-2); min-height: 52px;
+}
+.caption-bar .cap { flex: 1; transition: opacity 0.25s; }
+.icon-btn {
+  flex: none; width: 36px; height: 36px; border-radius: 50%; border: 0; cursor: pointer;
+  background: var(--fill); color: var(--text); display: grid; place-items: center;
+}
+.icon-btn svg { width: 18px; height: 18px; }
+
+.panel { display: flex; flex-direction: column; gap: 16px; }
+.group {
+  background: var(--card); border-radius: 14px; padding: 16px;
+}
+.group h3 { font-size: 15px; font-weight: 600; color: var(--text-2); margin: 0 0 10px; }
+.seg {
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  background: var(--fill); border-radius: 9px; padding: 2px; gap: 2px;
+}
+.seg button {
+  border: 0; background: transparent; color: var(--text); cursor: pointer;
+  font: 500 14px var(--ui); padding: 6px 4px; border-radius: 7px;
+}
+.seg button[aria-pressed="true"] { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.04); font-weight: 600; }
+:root[data-theme="dark"] .seg button[aria-pressed="true"] { background: #636366; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .seg button[aria-pressed="true"] { background: #636366; } }
+.hint { font-size: 14px; color: var(--text-2); margin: 0; }
+.hint b { color: var(--text); font-weight: 600; }
+
+/* "Did you mean": the app's sheet, as a card */
+.dym { display: none; }
+.dym.on { display: block; }
+.dym .line-title { font-size: 12px; font-weight: 600; color: var(--text-2); margin: 10px 0 4px; }
+.dym ul { list-style: none; margin: 0; padding: 0; }
+.dym li {
+  display: flex; align-items: center; gap: 8px; justify-content: space-between;
+  padding: 8px 10px; border-radius: 10px; font-size: 15px; overflow-x: auto;
+}
+.dym li + li { margin-top: 2px; }
+.dym li.cur { background: rgba(0, 122, 255, 0.10); }
+.dym li .check { color: var(--blue); flex: none; font-weight: 700; }
+.dym .ans { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--separator); }
+.dym .ans .k { color: var(--blue); font-size: 17px; overflow-x: auto; }
+.dym .ans small { display: block; color: var(--text-2); font-size: 13px; margin-top: 4px; }
+.dym .uncertain { display: flex; gap: 6px; align-items: flex-start; font-size: 13px; color: var(--text-2); margin-top: 8px; }
+.dym .uncertain i { width: 9px; height: 9px; border-radius: 50%; background: var(--orange); flex: none; margin-top: 4px; }
+
+/* ------------------------------------------------------------ features */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+.card {
+  background: var(--card); border-radius: 14px; padding: 22px;
+}
+.card .sym {
+  width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+  background: rgba(0, 122, 255, 0.12); color: var(--blue); margin-bottom: 14px;
+}
+.card .sym svg { width: 22px; height: 22px; }
+.card h3 { font-size: 19px; margin: 0 0 6px; }
+.card p { margin: 0; color: var(--text-2); font-size: 16px; }
+
+.topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.topics span {
+  background: var(--card); border-radius: 999px; padding: 7px 14px; font-size: 15px;
+}
+
+/* ------------------------------------------------------------ on the iPad */
+.ipad-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center; }
+@media (max-width: 820px) { .ipad-row { grid-template-columns: minmax(0, 1fr); } }
+.ipad {
+  background: #1c1c1e; border-radius: 34px; padding: 16px;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.06) inset;
+  max-width: 470px; margin: 0 auto;
+}
+.ipad video { display: block; border-radius: 20px; width: 100%; height: auto; aspect-ratio: 720 / 1044; background: #fff; }
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 36px 1fr; gap: 14px; padding: 14px 0; border-top: 1px solid var(--separator); }
+.steps li:first-child { border-top: 0; }
+.steps li::before {
+  content: counter(s); width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--blue); color: #fff; font-weight: 600; font-size: 15px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.steps b { display: block; }
+.steps span { color: var(--text-2); }
+/* with the videos: each step is a button, and the playing one shows its progress */
+.steps button {
+  all: unset; box-sizing: border-box; display: block; width: 100%; cursor: pointer;
+  border-radius: 10px; -webkit-tap-highlight-color: transparent;
+}
+.steps button:focus-visible { outline: 2px solid var(--blue); outline-offset: 4px; }
+.steps.live li:not(.on)::before { background: rgba(127, 127, 127, 0.2); color: var(--text-2); }
+.steps.live li:not(.on) b { color: var(--text-2); }
+.steps.live li:not(.on) button:hover b { color: var(--text); }
+.steps .bar { display: block; height: 3px; border-radius: 2px; margin-top: 10px; background: rgba(127, 127, 127, 0.2); overflow: hidden; opacity: 0; transition: opacity 0.3s; }
+.steps .bar i { display: block; height: 100%; width: 100%; background: var(--blue); transform-origin: 0 50%; transform: scaleX(0); }
+.steps.live li.on .bar { opacity: 1; }
+
+/* ------------------------------------------------------------ privacy band */
+.band { background: var(--ground); color: #fff; }
+.band h2 { color: #fff; }
+.band .sub { color: rgba(255,255,255,0.72); }
+.band .grid .card { background: rgba(255,255,255,0.06); }
+.band .card p { color: rgba(255,255,255,0.7); }
+.band .card .sym { background: rgba(255,255,255,0.1); color: #fff; }
+
+/* ------------------------------------------------------------ footer */
+footer { padding: 16px 0 48px; font-size: 14px; color: var(--text-2); }
+.foot {
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 32px;
+  padding-top: 22px; border-top: 1px solid var(--separator);
+}
+.foot nav { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.foot nav a { color: var(--text-2); }
+.foot nav a:hover { color: var(--text); text-decoration: none; }
+.foot .fine { margin: 0; font-size: 12px; color: var(--text-3); }
+
+/* ------------------------------------------------------------ legal pages */
+.doc-head { padding-top: 40px; padding-bottom: 44px; }
+.doc-head h1 { font-family: var(--display); font-size: clamp(36px, 6vw, 56px); line-height: 1.05; margin: 0 0 10px; }
+.doc-head p { margin: 0; color: rgba(255,255,255,0.72); }
+.doc { max-width: 760px; padding-top: 40px; padding-bottom: 24px; }
+.doc .summary { background: var(--card); border-radius: 14px; padding: 18px 22px; margin-bottom: 28px; }
+.doc .summary ul { margin: 6px 0 0; padding-left: 20px; }
+.doc h2 { font-family: var(--ui); font-size: 22px; font-weight: 700; margin: 36px 0 8px; }
+.doc h3 { font-size: 17px; margin: 22px 0 6px; }
+.doc p, .doc li { color: var(--text); }
+.doc ul { padding-left: 22px; }
+.doc li + li { margin-top: 4px; }
+.doc .muted { color: var(--text-2); }
+.doc table { border-collapse: collapse; width: 100%; font-size: 15px; margin: 8px 0; }
+.doc th, .doc td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--separator); vertical-align: top; }
+.doc th { color: var(--text-2); font-weight: 600; }
+.table-scroll { overflow-x: auto; }
+.caps { text-transform: uppercase; font-size: 15px; }
+details.faq { background: var(--card); border-radius: 14px; padding: 4px 18px; margin: 10px 0; }
+details.faq summary { cursor: pointer; font-weight: 600; padding: 12px 0; }
+details.faq p { margin-top: 0; }
+
+/* ------------------------------------------------------------ App Store */
+.store-badge { display: inline-block; line-height: 0; border-radius: 10px; }
+.store-badge img { height: 50px; width: auto; }
+.store-badge:hover { filter: brightness(1.15); }
+.get { padding: 48px 0 36px; }
+.get-card {
+  display: flex; align-items: center; gap: 20px;
+  background: var(--card); border-radius: 20px; padding: 22px 26px;
+}
+.get-icon {                               /* the app icon's rounded square */
+  width: 64px; height: 64px; flex: none;
+  border-radius: 15px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 0 0 0.5px var(--separator);
+}
+.get-text { flex: 1; min-width: 0; }
+.get-text h2 { font-size: 24px; line-height: 1.2; margin: 0 0 2px; }
+.get-text p { margin: 0; font-size: 15px; color: var(--text-2); }
+.get-card .store-badge { flex: none; }
+.get-card .store-badge img { height: 44px; }
+@media (max-width: 600px) {
+  .get-card { flex-wrap: wrap; gap: 14px 16px; padding: 18px; }
+  .get-icon { width: 56px; height: 56px; border-radius: 13px; }
+  .get-text h2 { font-size: 20px; }
+  .get-card .store-badge { flex-basis: 100%; }
+}
+
+/* "Download for iPad" scrolls here; the badge gives a small nod when it arrives */
+#download { scroll-margin-top: 40px; }
+#download:target .store-badge { animation: badge-nod 0.7s var(--spring) 0.55s both; }
+@keyframes badge-nod {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { #download:target .store-badge { animation: none; } }
+
+/* ------------------------------------------------------------ pricing */
+.plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+@media (max-width: 860px) { .plans { grid-template-columns: minmax(0, 1fr); } }
+.plan { background: var(--card); border-radius: 20px; padding: 26px 24px 24px; display: flex; flex-direction: column; }
+.plan.top { box-shadow: inset 0 0 0 2px var(--blue); }
+.plan h3 { font-size: 17px; font-weight: 600; color: var(--text-2); margin: 0 0 6px; }
+.plan .price { margin: 0 0 18px; display: flex; align-items: baseline; gap: 4px; }
+.plan .price b { font-family: var(--display); font-size: 40px; line-height: 1; color: var(--text); }
+.plan .price span { font-size: 15px; color: var(--text-2); }
+.plan ul { list-style: none; padding: 18px 0 0; margin: 0; border-top: 1px solid var(--separator); }
+.plan li { position: relative; padding-left: 26px; font-size: 15px; }
+.plan li + li { margin-top: 10px; }
+.plan li::before {
+  content: ""; position: absolute; left: 0; top: 4px; width: 16px; height: 16px;
+  background: var(--blue);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3 8.5l3 3 7-7' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.plan-note { margin: 20px 0 0; font-size: 14px; color: var(--text-2); max-width: 70ch; }
+#pricing { scroll-margin-top: 10px; }
+.doc h2, .doc [id] { scroll-margin-top: 80px; }
+.band .grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
