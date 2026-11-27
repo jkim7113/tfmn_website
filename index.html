@@ -55,7 +55,7 @@
 
       <div class="demo">
         <div class="sheet" id="sheet" data-color="white">
-          <svg class="page" id="page" viewBox="40 60 740 790" role="img" aria-labelledby="pageTitle">
+          <svg class="page" id="page" viewBox="40 60 740 860" role="img" aria-labelledby="pageTitle">
             <title id="pageTitle">A notebook page with handwritten math and blue answers</title>
             <defs>
               <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse">
@@ -68,8 +68,8 @@
                 <circle cx="17" cy="17" r="1.6" fill="var(--rule)"/>
               </pattern>
             </defs>
-            <rect id="paperPattern" x="40" y="60" width="740" height="790" fill="url(#grid)"/>
-            <line id="marginLine" x1="60" y1="60" x2="60" y2="850" stroke="var(--margin)" stroke-width="1.2" visibility="hidden"/>
+            <rect id="paperPattern" x="40" y="60" width="740" height="860" fill="url(#grid)"/>
+            <line id="marginLine" x1="60" y1="60" x2="60" y2="920" stroke="var(--margin)" stroke-width="1.2" visibility="hidden"/>
             <g class="ink" id="ink"></g>
             <g id="answers"></g>
             <g id="hits"></g>
@@ -90,6 +90,13 @@
           <div class="group" id="tapHint">
             <h3>Did you mean</h3>
             <p class="hint">Tap any expression on the page. You'll see how the app read it and the other readings it considered. In the app you can choose one of those readings or type the LaTeX yourself.</p>
+          </div>
+          <div class="group">
+            <h3>Page</h3>
+            <div class="seg" role="group" aria-label="Demo page" id="segPage">
+              <button aria-pressed="true" data-v="0">Basics</button>
+              <button aria-pressed="false" data-v="1">Advanced</button>
+            </div>
           </div>
           <div class="group">
             <h3>Paper</h3>
@@ -200,6 +207,11 @@
       <p class="eyebrow">Pricing</p>
       <h2>Start free. Upgrade when you need more.</h2>
       <p class="sub">Every plan reads your handwriting and solves on your iPad. The plans differ in notebooks, handwriting and AI explanations.</p>
+      <div class="seg price-tabs" role="tablist" aria-label="Purchase type" id="segPrice">
+        <button role="tab" aria-pressed="true" aria-selected="true" aria-controls="priceSub" data-v="priceSub">Subscription</button>
+        <button role="tab" aria-pressed="false" aria-selected="false" aria-controls="priceOnce" data-v="priceOnce">One-time purchase</button>
+      </div>
+      <div id="priceSub" role="tabpanel">
       <div class="plans">
         <div class="plan">
           <h3>Free</h3>
@@ -236,6 +248,9 @@
           </ul>
         </div>
       </div>
+      <p class="plan-note">Prices in US dollars. Yearly plans start with a 7-day free trial; subscriptions renew until you cancel in your Apple ID settings. On Free, every notebook stays yours to view and export. <a href="terms.html#subscriptions">Terms</a></p>
+      </div>
+      <div id="priceOnce" role="tabpanel" hidden>
       <div class="plan lifetime">
         <div>
           <h3>Lifetime Offline</h3>
@@ -250,7 +265,8 @@
           <li>10 starter AI explanations (no monthly explanations)</li>
         </ul>
       </div>
-      <p class="plan-note">Prices in US dollars. Yearly plans start with a 7-day free trial; subscriptions renew until you cancel in your Apple ID settings. On Free, every notebook stays yours to view and export. <a href="terms.html#subscriptions">Terms</a></p>
+      <p class="plan-note">Price in US dollars. Pay once and keep it: no subscription, nothing renews. <a href="terms.html">Terms</a></p>
+      </div>
     </div>
   </section>
 
@@ -299,6 +315,20 @@
 <script src="demo-data.js" defer></script>
 <script src="demo.js" defer></script>
 <script src="nav.js" defer></script>
+<script>
+  // pricing: Subscription / One-time purchase, a segmented control like the paper colors
+  (function () {
+    var seg = document.getElementById("segPrice");
+    seg.addEventListener("click", function (e) {
+      var b = e.target.closest("button"); if (!b) return;
+      seg.querySelectorAll("button").forEach(function (x) {
+        var on = x === b;
+        x.setAttribute("aria-pressed", on); x.setAttribute("aria-selected", on);
+        document.getElementById(x.dataset.v).hidden = !on;
+      });
+    });
+  })();
+</script>
 <script src="steps.js" defer></script>
 </body>
 </html>

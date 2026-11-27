@@ -3,7 +3,9 @@
 (function () {
   "use strict";
   var NS = "http://www.w3.org/2000/svg";
-  var data = window.DEMO || [];
+  var pages = [window.DEMO || [], window.DEMO_ADV || []];   // Basics, Advanced
+  var data = pages[0];
+  var groups = [];
   var ink = document.getElementById("ink");
   var answersG = document.getElementById("answers");
   var hitsG = document.getElementById("hits");
@@ -32,8 +34,10 @@
     return d + "L" + last[0] + " " + last[1];
   }
 
-  // ------------------------------------------------------------ build the page once
-  var groups = data.map(function (g, gi) {
+  // ------------------------------------------------------------ build a page (again on a page switch)
+  function build() {
+  ink.textContent = ""; answersG.textContent = ""; hitsG.textContent = "";
+  groups = data.map(function (g, gi) {
     var paths = g.strokes.map(function (s) { return el("path", { d: pathFor(s) }, ink); });
 
     var a = el("g", { "class": "answer", "aria-hidden": "true" }, answersG);
@@ -45,6 +49,26 @@
       el("text", { x: cx, y: y - size * 0.42, "font-size": size, "text-anchor": "middle", "dominant-baseline": "central" }, a).textContent = num;
       el("line", { x1: cx - w / 2, y1: y + 1, x2: cx + w / 2, y2: y - 1 }, a);
       el("text", { x: cx, y: y + size * 0.5, "font-size": size, "text-anchor": "middle", "dominant-baseline": "central" }, a).textContent = den;
+    } else if (g.answer && typeof g.answer === "object" && g.answer.matrix) {
+      // a matrix: cells in columns between two handwritten-looking brackets
+      var rows = g.answer.matrix, n = rows.length, rowH = size * 1.25;
+      var colW = rows[0].map(function (_, c) {
+        return Math.max.apply(null, rows.map(function (r) { return r[c].length; })) * size * 0.5 + size * 0.7;
+      });
+      var top = y - n * rowH / 2, left = x + 10, wAll = colW.reduce(function (a, b) { return a + b; }, 0);
+      function bracket(bx, dir) {
+        var pl = el("polyline", { points: [bx + dir * 7, top, bx, top, bx, top + n * rowH, bx + dir * 7, top + n * rowH].join(" ") }, a);
+        pl.setAttribute("fill", "none");
+      }
+      bracket(left, 1);
+      rows.forEach(function (r, ri) {
+        var cx = left + 6;
+        r.forEach(function (cell, ci) {
+          el("text", { x: cx + colW[ci] / 2, y: top + (ri + 0.5) * rowH, "font-size": size, "text-anchor": "middle", "dominant-baseline": "central" }, a).textContent = cell;
+          cx += colW[ci];
+        });
+      });
+      bracket(left + wAll + 12, -1);
     } else if (g.answer) {
       el("text", { x: x + 4, y: y + 2, "font-size": size, "dominant-baseline": "central" }, a).textContent = g.answer;
     }
@@ -65,6 +89,8 @@
   groups.forEach(function (g) {
     g.lengths = g.paths.map(function (p) { var L = p.getTotalLength(); p.style.strokeDasharray = L + 1; return L; });
   });
+  }
+  build();
 
   function placeDot(g) {
     if (!g.dot) return;
@@ -177,6 +203,15 @@
     document.getElementById("marginLine").setAttribute("visibility", v === "lined" ? "visible" : "hidden");
   });
   segmented("segColor", function (v) { sheet.dataset.color = v; });
+  segmented("segPage", function (v) {
+    run++;                                   // stop the page being written
+    data = pages[+v]; build();
+    selected = -1;
+    document.getElementById("dym").classList.remove("on");
+    document.getElementById("tapHint").style.display = "";
+    if (reduce) { showAll(); return; }
+    play();
+  });
 
   document.getElementById("replay").addEventListener("click", function () {
     if (reduce) { showAll(); return; }

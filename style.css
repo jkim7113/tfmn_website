@@ -372,7 +372,7 @@ h2 {
 .sheet[data-color="white"] { --paper: #ffffff; --rule: rgba(158, 189, 230, 0.55); --margin: rgba(230, 89, 89, 0.45); --ink: #111; }
 
 .answer { fill: var(--blue); font-family: var(--hand); opacity: 0; transition: opacity 0.45s ease; }
-.answer line { stroke: var(--blue); stroke-width: 2.4; stroke-linecap: round; }
+.answer line, .answer polyline { stroke: var(--blue); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
 .answer.on { opacity: 1; }
 .dot { fill: var(--orange); opacity: 0; transition: opacity 0.45s ease; }
 .dot.on { opacity: 1; }
@@ -579,12 +579,14 @@ details.faq p { margin-top: 0; }
   .plans > .plan { display: grid; grid-row: span 4; grid-template-rows: subgrid; row-gap: 0; }
 }
 .plan.lifetime .price-note { min-height: 0; }
-.plan.lifetime { margin-top: 16px; display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 8px 32px; align-items: start; }
+.plan.lifetime { margin-top: 0; display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 8px 32px; align-items: start; }
 .plan.lifetime ul { border-top: 0; padding-top: 4px; }
 @media (max-width: 860px) {
   .plan.lifetime { grid-template-columns: minmax(0, 1fr); }
   .plan.lifetime ul { border-top: 1px solid var(--separator); padding-top: 18px; }
 }
+.price-tabs { width: min(100%, 380px); margin: 0 0 22px; }
+.price-tabs button { font-size: 15px; padding: 7px 10px; }
 .plan-note { margin: 20px 0 0; font-size: 14px; color: var(--text-2); max-width: 70ch; }
 #pricing { scroll-margin-top: 10px; }
 .doc h2, .doc [id] { scroll-margin-top: 80px; }
