@@ -581,6 +581,8 @@ details.faq p { margin-top: 0; }
 .plan.lifetime .price-note { min-height: 0; }
 .plan.lifetime { margin-top: 0; display: grid; grid-template-columns: minmax(220px, 280px) 1fr; gap: 8px 32px; align-items: start; }
 .plan.lifetime ul { border-top: 0; padding-top: 4px; }
+.plan.addon { margin-top: 16px; }
+.plan .tag { display: inline-block; margin-left: 6px; padding: 2px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; vertical-align: 2px; color: var(--blue); background: color-mix(in srgb, var(--blue) 14%, transparent); }
 @media (max-width: 860px) {
   .plan.lifetime { grid-template-columns: minmax(0, 1fr); }
   .plan.lifetime ul { border-top: 1px solid var(--separator); padding-top: 18px; }

@@ -27,7 +27,7 @@
   </div>
   <div class="wrap doc-head">
     <h1>Privacy Policy</h1>
-    <p>Effective November 26, 2026</p>
+    <p>Effective November 28, 2026</p>
   </div>
 </header>
 
@@ -66,17 +66,25 @@
     <li>any definitions from the same notebook that the expression uses (for example <i>x</i> = 3);</li>
     <li>your app settings that change the math, such as degrees or radians.</li>
   </ul>
-  <p>The app doesn't send your handwriting, other expressions, pictures, PDFs or anything from other notebooks. The request goes to our server, which passes it to our AI provider, [AI provider], to write the explanation. [AI provider] processes requests for us only to answer them and doesn't use them to train its models. We don't keep the content of your requests once the explanation has been delivered.</p>
+  <p>The app doesn't send your handwriting, other expressions, pictures, PDFs or anything from other notebooks. The request goes to our server, which runs on Cloudflare, and the server passes it to our AI provider, Anthropic, to write the explanation with its Claude models. Anthropic processes requests for us to answer them and doesn't use them to train its models. It may keep them for a limited time under its own policies, for example to detect misuse (see <a href="https://www.anthropic.com/legal/privacy">Anthropic's privacy policy</a>). We don't keep the content of your requests once the explanation has been delivered.</p>
   <p>Please don't include personal information in an expression you ask to have explained.</p>
 
   <h3>Plan and usage information</h3>
-  <p>Each plan includes a number of explanations a month. To count them, the app sends our server a random identifier when you ask for an explanation. This identifier is created by the app and isn't linked to your name, Apple ID or email. If you subscribe, the app also sends Apple's anonymous transaction ID for your subscription, so the server can check with Apple which plan is active. Our server keeps the identifier, your plan and how many explanations you've used this month. These records are deleted after 12 months without any explanation requests.</p>
+  <p>Each plan includes a number of explanations. To check your plan and count what you've used, the app sends our server, with each explanation request:</p>
+  <ul>
+    <li>a random identifier the app creates and keeps on your iPad;</li>
+    <li>Apple's signed record that the app came from the App Store, which includes an identifier Apple assigns to your download of the app, its version and dates;</li>
+    <li>if you've bought a plan or AI Pass, Apple's signed record of each active purchase: which product it is, its transaction identifiers and its purchase and expiry dates.</li>
+  </ul>
+  <p>Apple signs these records, so our server can confirm your plan without asking the app to vouch for it. They don't include your name, email address, Apple ID or payment details.</p>
+  <p>Our server keeps a counter of how many explanations you've used, stored under your purchase's transaction identifier (on a paid plan or AI Pass), Apple's download identifier, or the app's random identifier (on Free). Monthly counters are deleted after the following month, and any counter is deleted after 12 months without an explanation request.</p>
+  <p>Like any server, ours sees the IP address a request comes from. On Free, we count requests per IP address per day to stop automated abuse; those counts are deleted within two days. We don't use IP addresses to identify you or to track you.</p>
 
   <h3>Crash reports from Apple</h3>
   <p>If you've turned on “Share With App Developers” in your iPad's settings (Privacy &amp; Security → Analytics &amp; Improvements), Apple may give us anonymous crash reports and usage statistics. Apple collects these, and they're governed by Apple's privacy policy. They don't include your notebooks.</p>
 
   <h2>Purchases and subscriptions</h2>
-  <p>Apple handles downloads, subscriptions, payments and refunds through the App Store, under Apple's privacy policy. We don't receive your name, email address or payment details. We only learn, through Apple, which plan is active and when it renews or ends.</p>
+  <p>Apple handles downloads, subscriptions, payments and refunds through the App Store, under Apple's privacy policy. We don't receive your name, email address or payment details. We only learn, through Apple's signed records described above, which plan or AI Pass is active and when it renews or ends.</p>
 
   <h2>Photos and files</h2>
   <p>When you add a picture, the app uses the system photo picker. Only the picture you choose is given to the app, and the app doesn't ask for access to your photo library. Pictures you paste, and PDFs you import, are copied into the notebook on your device and are never sent anywhere by the app.</p>
